@@ -2,6 +2,7 @@
 #define RANDTREE_H
 #include <cstdlib>
 #include <utility>
+#include <climits>
 
 using namespace std;
 
@@ -38,7 +39,13 @@ class randTree {
     void Delete(tip element) { korijen = deleteRek(element, korijen); }
 
     template <typename tip1>
-    friend pair<randTree<tip1>, randTree<tip1>> Split(tip1 element, randTree<tip1> &s);
+    friend pair<randTree<tip1>, randTree<tip1>> Split(tip1 element, randTree<tip1> s);
+
+    template <typename Tip>
+    friend randTree<Tip> Join(randTree<Tip> t1, randTree<Tip> t2, Tip vrijednost);
+
+    template <typename Tip>
+    friend randTree<Tip> Union(randTree<Tip> t1, randTree<Tip> t2);
 
     void inorderIspis() { inorderRek(korijen); }
 
