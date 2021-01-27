@@ -21,7 +21,7 @@ class randTree {
 
     void inorderRek(Cvor* cvor);
 
-    Cvor* insertRek(tip element, Cvor* cvor, int prioritett = rand() % 1000 + 1);
+    Cvor* insertRek(tip element, Cvor* cvor, int prioritett);
 
     Cvor* deleteRek(tip element, Cvor* cvor);
 
@@ -29,9 +29,11 @@ class randTree {
 
     randTree(): korijen(nullptr) {}
 
+    pair<int, int> dajKorijen() const { return pair<int,int>{korijen->vrijednost, korijen->prioritet}; }
+
     bool Find(tip element) { return FindRek(element, korijen); }
 
-    void Insert(tip element) { korijen = insertRek(element, korijen); }
+    void Insert(tip element, int prioritett = rand() % 1000 + 1) { korijen = insertRek(element, korijen, prioritett); }
 
     void Delete(tip element) { korijen = deleteRek(element, korijen); }
 
