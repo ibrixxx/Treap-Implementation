@@ -41,7 +41,7 @@ typename randTree<tip>::Cvor* randTree<tip>::insertRek(tip element, Cvor* cvor, 
     }
     else if(cvor->vrijednost < element) {
         cvor->desno = insertRek(element, cvor->desno, randBroj);
-        if(cvor->desno->prioritet < cvor->prioritet){
+        if(cvor->desno->prioritet > cvor->prioritet){
             Cvor* pom = cvor->desno;
             cvor->desno = pom->lijevo;
             pom->lijevo = cvor;
@@ -50,7 +50,7 @@ typename randTree<tip>::Cvor* randTree<tip>::insertRek(tip element, Cvor* cvor, 
     }
     else if(cvor->vrijednost > element) {
         cvor->lijevo = insertRek(element, cvor->lijevo, randBroj);
-        if(cvor->lijevo->prioritet < cvor->prioritet){
+        if(cvor->lijevo->prioritet > cvor->prioritet){
             Cvor* pom = cvor->lijevo;
             cvor->lijevo = pom->desno;
             pom->desno = cvor;
@@ -99,10 +99,10 @@ typename randTree<tip>::Cvor* randTree<tip>::deleteRek(tip element, Cvor* cvor) 
 
 
 template <typename tip1>
-pair<randTree<tip1>, randTree<tip1>> randTree<tip1>::Split(tip1 element, randTree<tip1> &s); {
-    Cvor* pok = s.korijen;
-    pok->prioritet += 1;
-    s.insertRek(element, s->korijen, pok->prioritet);
+pair<randTree<tip1>, randTree<tip1>> Split(tip1 element, randTree<tip1> &s) {
+    int pr = s.korijen->prioritet;
+    pr++;
+    s.Insert(element, pr);
     randTree<tip1> s1;
     randTree<tip1> s2;
     s1.korijen = s.korijen->lijevo;
