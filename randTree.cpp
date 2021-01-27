@@ -42,6 +42,7 @@ typename randTree<tip>::Cvor* randTree<tip>::insertRek(tip element, Cvor* cvor, 
     else if(cvor->vrijednost < element) {
         cvor->desno = insertRek(element, cvor->desno, randBroj);
         if(cvor->desno->prioritet > cvor->prioritet){
+            //lijeva rotacija
             Cvor* pom = cvor->desno;
             cvor->desno = pom->lijevo;
             pom->lijevo = cvor;
@@ -51,6 +52,7 @@ typename randTree<tip>::Cvor* randTree<tip>::insertRek(tip element, Cvor* cvor, 
     else if(cvor->vrijednost > element) {
         cvor->lijevo = insertRek(element, cvor->lijevo, randBroj);
         if(cvor->lijevo->prioritet > cvor->prioritet){
+            //desna rotacija
             Cvor* pom = cvor->lijevo;
             cvor->lijevo = pom->desno;
             pom->desno = cvor;
@@ -99,7 +101,7 @@ typename randTree<tip>::Cvor* randTree<tip>::deleteRek(tip element, Cvor* cvor) 
 
 
 template <typename tip1>
-pair<randTree<tip1>, randTree<tip1>> Split(tip1 element, randTree<tip1> &s) {
+pair<randTree<tip1>, randTree<tip1>> Split(tip1 element, randTree<tip1> s) {
     int pr = s.korijen->prioritet;
     pr++;
     s.Insert(element, pr);
@@ -113,6 +115,62 @@ pair<randTree<tip1>, randTree<tip1>> Split(tip1 element, randTree<tip1> &s) {
     return rez;
 }
 
+
+template <typename Tip>
+randTree<Tip> Join(randTree<Tip> t1, randTree<Tip> t2, Tip vrijednost = INT_MIN) {
+    auto pok1 = t1.korijen;
+    while(pok1->desno != nullptr)
+        pok1 = pok1->desno;
+
+    //cout<<pok1->vrijednost<<','<<pok2->vrijednost;
+    Tip pom = pok1->vrijednost;
+    if(vrijednost == INT_MIN)
+        pom++;
+    else
+        pom = vrijednost;
+
+    typename randTree<Tip>::Cvor* cvor = new typename randTree<Tip>::Cvor(pom, -1);
+    randTree<Tip>* rez = new randTree<Tip>();
+
+    rez->korijen = cvor;
+    cvor->lijevo = t1.korijen;
+    cvor->desno = t2.korijen;
+
+    rez->korijen = rez->deleteRek(pom, cvor);
+
+    return *rez;
+}
+
+
+template <typename Tip>
+randTree<Tip> Union(randTree<Tip> t1, randTree<Tip> t2) {
+    if(t1.korijen == nullptr)
+        return t2;
+    if(t2.korijen == nullptr)
+        return t1;
+    if(t1.korijen->prioritet < t2.korijen->prioritet){
+        auto temp = t1.korijen;
+        t1.korijen = t2.korijen;
+        t2.korijen = temp;
+        //swap(t1.korijen, t2.korijen);
+    }
+
+    pair<randTree<Tip>, randTree<Tip> > p = Split(t1.korijen->vrijednost, t2);
+    randTree<Tip> *t1Lijevo = new randTree<Tip>(), *t1Desno = new randTree<Tip>(), *manje = new randTree<Tip>(), *vece = new randTree<Tip>();
+
+    t1Lijevo->korijen = t1.korijen->lijevo;
+    t1Desno->korijen = t1.korijen->desno;
+
+    *manje = p.first;
+    *vece = p.second;
+
+    *t1Lijevo = Union(*t1Lijevo, *manje);
+    *t1Desno = Union(*t1Desno, *vece);
+
+    randTree<Tip> *rez = new randTree<Tip>();
+    *rez = Join(*t1Lijevo, *t1Desno, t1.korijen->vrijednost);
+    return *rez;
+}
 
 
 
