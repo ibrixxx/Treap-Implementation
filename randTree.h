@@ -3,8 +3,10 @@
 #include <cstdlib>
 #include <utility>
 #include <climits>
+#include <ctime>
 
 using namespace std;
+
 
 template <typename tip>
 class randTree {
@@ -26,6 +28,8 @@ class randTree {
 
     Cvor* deleteRek(tip element, Cvor* cvor);
 
+    void pomjeriDolje(Cvor* cvor, bool f = true);
+
     public:
 
     randTree(): korijen(nullptr) {}
@@ -39,13 +43,13 @@ class randTree {
     void Delete(tip element) { korijen = deleteRek(element, korijen); }
 
     template <typename tip1>
-    friend pair<randTree<tip1>, randTree<tip1>> Split(tip1 element, randTree<tip1> s);
+    friend pair<randTree<tip1>, randTree<tip1>> Split(tip1 element, randTree<tip1> &s);
 
     template <typename Tip>
-    friend randTree<Tip> Join(randTree<Tip> t1, randTree<Tip> t2, Tip vrijednost);
+    friend randTree<Tip>& Join(randTree<Tip> &t1, randTree<Tip> &t2, Tip vrijednost);
 
     template <typename Tip>
-    friend randTree<Tip> Union(randTree<Tip> t1, randTree<Tip> t2);
+    friend randTree<Tip>& Union(randTree<Tip> &t1, randTree<Tip> &t2);
 
     void inorderIspis() { inorderRek(korijen); }
 
