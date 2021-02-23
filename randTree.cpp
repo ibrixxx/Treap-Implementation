@@ -68,10 +68,12 @@ template <typename tip>
 typename randTree<tip>::Cvor* randTree<tip>::deleteRek(tip element, Cvor* cvor) {
     if(cvor == nullptr)
         return cvor;
+
     if(element > cvor->vrijednost)
         cvor->desno = deleteRek(element, cvor->desno);
     else if(element < cvor->vrijednost)
         cvor->lijevo = deleteRek(element, cvor->lijevo);
+
     else if(!cvor->lijevo){
         Cvor* pom = cvor->desno;
         delete(cvor);
@@ -82,6 +84,7 @@ typename randTree<tip>::Cvor* randTree<tip>::deleteRek(tip element, Cvor* cvor) 
         delete(cvor);
         cvor = pom;
     }
+
     else if(cvor->lijevo->prioritet < cvor->desno->prioritet) {
         Cvor* pom = cvor->desno;
         cvor->desno = pom->lijevo;
@@ -96,6 +99,7 @@ typename randTree<tip>::Cvor* randTree<tip>::deleteRek(tip element, Cvor* cvor) 
         cvor = pom;
         cvor->desno = deleteRek(element, cvor->desno);
     }
+
     return cvor;
 }
 
@@ -107,79 +111,37 @@ pair<randTree<tip1>, randTree<tip1>> Split(tip1 element, randTree<tip1> &s) {
     s.Insert(element, pr);
     randTree<tip1> s1;
     randTree<tip1> s2;
-    s1.korijen = s.korijen->lijevo;
-    s2.korijen = s.korijen->desno;
+    typename randTree<tip1>::Cvor *k1 = s.korijen->lijevo;
+    typename randTree<tip1>::Cvor *k2 = s.korijen->desno;
+    s1.korijen = k1;
+    s2.korijen = k2;
     pair<randTree<tip1>, randTree<tip1>> rez;
     rez.first = s1;
     rez.second = s2;
     return rez;
 }
 
-template <typename tip>
-void randTree<tip>::pomjeriDolje(Cvor* cvor, bool f) {
-    if(cvor->lijevo == nullptr && cvor->desno == nullptr) {
-			return;
-    }
-
-    if(cvor->lijevo != nullptr && cvor->desno != nullptr) {
-        if (cvor->lijevo->prioritet < cvor->desno->prioritet) {
-            Cvor* pom = cvor->lijevo;
-            cvor->lijevo = pom->desno;
-            pom->desno = cvor;
-            cvor = pom;
-            if(f)
-                this->korijen = pom->lijevo;
-        }
-        else {
-            Cvor* pom = cvor->desno;
-            cvor->desno = pom->lijevo;
-            pom->lijevo = cvor;
-            cvor = pom;
-            if(f)
-                this->korijen = pom->lijevo;
-        }
-    }
-    else if (cvor->lijevo != nullptr) {
-        Cvor* pom = cvor->lijevo;
-        cvor->lijevo = pom->desno;
-        pom->desno = cvor;
-        cvor = pom;
-        if(f)
-        this->korijen = pom->lijevo;
-    }
-    else {
-        Cvor* pom = cvor->desno;
-        cvor->desno = pom->lijevo;
-        pom->lijevo = cvor;
-        cvor = pom;
-        if(f)
-        this->korijen = pom->lijevo;
-    }
-
-
-    pomjeriDolje(cvor, false);
-}
 
 
 template <typename Tip>
-randTree<Tip>& Join(randTree<Tip> &t1, randTree<Tip> &t2, Tip vrijednost = INT_MIN) {
-    auto pok1 = t1.korijen;
+randTree<Tip>& Join(randTree<Tip> &t1, randTree<Tip> &t2) {
+    typename randTree<Tip>::Cvor *pok1;
+    if(t1.korijen->vrijednost < t2.korijen->vrijednost)
+        pok1 = t1.korijen;
+    else
+        pok1 = t2.korijen;
     while(pok1->desno != nullptr)
         pok1 = pok1->desno;
 
-    //cout<<pok1->vrijednost<<','<<pok2->vrijednost;
     Tip pom = pok1->vrijednost;
-    if(vrijednost == INT_MIN)
-        pom++;
-    else
-        pom = vrijednost;
+    pom++;
 
     typename randTree<Tip>::Cvor* cvor = new typename randTree<Tip>::Cvor(pom, -1);
     randTree<Tip>* rez = new randTree<Tip>();
 
     rez->korijen = cvor;
-    cvor->lijevo = t1.korijen;
-    cvor->desno = t2.korijen;
+    rez->korijen->lijevo = t1.korijen;
+    rez->korijen->desno = t2.korijen;
 
     rez->korijen = rez->deleteRek(pom, cvor);
 
@@ -202,15 +164,14 @@ randTree<Tip>& Union(randTree<Tip> &t1, randTree<Tip> &t2) {
 
     pair<randTree<Tip>, randTree<Tip> > p = Split(t1.korijen->vrijednost, t2);
 
-    randTree<Tip> *t1Lijevo = new randTree<Tip>(), *t1Desno = new randTree<Tip>(), *manje = new randTree<Tip>(), *vece = new randTree<Tip>();
+    //randTree<Tip> *t1Lijevo = new randTree<Tip>(), *t1Desno = new randTree<Tip>(), *manje = new randTree<Tip>(), *vece = new randTree<Tip>();
+    typename randTree<Tip>::Cvor *k1 = t1.korijen->lijevo;
+    typename randTree<Tip>::Cvor *k2 = t1.korijen->desno;
 
-    t1Lijevo->korijen = t1.korijen->lijevo;
-    t1Desno->korijen = t1.korijen->desno;
+    randTree<Tip> t1Lijevo; t1Lijevo.korijen = k1;
+    randTree<Tip> t1Desno; t1Desno.korijen = k2;
 
-    *manje = p.first;
-    *vece = p.second;
-
-    return Join(Union(*t1Lijevo, *manje), Union(*t1Desno, *vece), t1.korijen->vrijednost);
+    return Join(Union(t1Lijevo, p.first), Union(t1Desno, p.second));
 }
 
 
